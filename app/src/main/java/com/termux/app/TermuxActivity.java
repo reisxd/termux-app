@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -22,12 +23,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.autofill.AutofillManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.termux.BuildConfig;
 import com.termux.R;
 import com.termux.app.api.file.FileReceiverActivity;
 import com.termux.app.terminal.TermuxActivityRootView;
@@ -190,6 +196,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
     private static final int CONTEXT_MENU_SETTINGS_ID = 8;
     private static final int CONTEXT_MENU_REPORT_ID = 9;
 
+    private boolean WEBVIEW_STARTED = false;
     private static final String ARG_TERMINAL_TOOLBAR_TEXT_INPUT = "terminal_toolbar_text_input";
     private static final String ARG_ACTIVITY_RECREATED = "activity_recreated";
 
@@ -278,6 +285,33 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         // Send the {@link TermuxConstants#BROADCAST_TERMUX_OPENED} broadcast to notify apps that Termux
         // app has been opened.
         TermuxUtils.sendTermuxOpenedBroadcast(this);
+
+        WebView browser = (WebView) findViewById(R.id.webview);
+        browser.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
+        WebSettings webSettings = browser.getSettings();
+        webSettings.setAppCacheEnabled(false);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setJavaScriptEnabled(true);
+        browser.setWebViewClient(new WebViewClient() {
+            public void onPageFinished(WebView view, String url) {
+                Log.d(LOG_TAG, url);
+                if (url.startsWith("http://localhost:") && !WEBVIEW_STARTED) {
+                    WEBVIEW_STARTED = true;
+                    view.loadUrl(url);
+                    Log.d(LOG_TAG, "change url");
+                    LinearLayout lDrawer = (LinearLayout)findViewById(R.id.left_drawer);
+                    lDrawer.setVisibility(View.GONE);
+                    ViewPager tBar = (ViewPager)findViewById(R.id.terminal_toolbar_view_pager);
+                    tBar.setVisibility(View.GONE);
+                    TerminalView tView = (TerminalView)findViewById(R.id.terminal_view);
+                    tView.setVisibility(View.GONE);
+                }
+
+            }
+        });
+        browser.loadData("<script>let ws = new WebSocket('ws://localhost:8000');ws.onopen = () => window.open(\"http://localhost:8000\", \"_self\"); setInterval(() => { ws = new WebSocket('ws://localhost:8000'); ws.onopen = () => window.open(\"http://localhost:8000\", \"_self\"); }, 3000);</script>", "text/html; charset=utf-8", "UTF-8");
     }
 
     @Override

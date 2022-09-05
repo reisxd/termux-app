@@ -11,6 +11,8 @@ import com.termux.terminal.TerminalRow;
 import com.termux.terminal.TextStyle;
 import com.termux.terminal.WcWidth;
 
+import java.util.logging.Logger;
+
 /**
  * Renderer of a {@link TerminalEmulator} into a {@link Canvas}.
  * <p/>
@@ -231,9 +233,16 @@ public final class TerminalRenderer {
             mTextPaint.setTextSkewX(italic ? -0.35f : 0.f);
             mTextPaint.setStrikeThruText(strikeThrough);
             mTextPaint.setColor(foreColor);
-
+            String str = String.valueOf(text);
+            char[] st = {'h', 'i', ' ', 't', 'e', 's', 't'};
+            if (str.contains("Listening at port")) {
+                // Do nothing.
+                
+            } else {
+                canvas.drawText(text, startCharIndex, runWidthChars, left, y - mFontLineSpacingAndAscent, mTextPaint);
+            }
             // The text alignment is the default Paint.Align.LEFT.
-            canvas.drawText(text, startCharIndex, runWidthChars, left, y - mFontLineSpacingAndAscent, mTextPaint);
+
         }
 
         if (savedMatrix) canvas.restore();
