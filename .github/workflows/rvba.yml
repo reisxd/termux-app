@@ -1,0 +1,139 @@
+name: "[Alpha] Build RVBA Bootstraps"
+
+on: workflow_dispatch
+
+jobs:
+  build-bootstraps:
+    strategy:
+      matrix:
+        arch: [aarch64, arm]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout termux-packages
+        uses: actions/checkout@v3
+        with:
+          repository: 'termux/termux-packages'
+      - name: Patch generate script
+        run: |
+          PKGS_TO_REMOVE='bzip2 proot diffutils findutils gawk grep less procps psmisc sed tar termux-keyring nano util-linux xz-utils ed debianutils dos2unix inetutils lsof net-tools patch'
+          for pkg in $PKGS_TO_REMOVE; do
+            sed -i "s@pull_package $pkg@echo \"$pkg, take a huge L\"@g" ./scripts/generate-bootstraps.sh
+          done
+      - name: Build bootstrap for ${{ matrix.arch }}
+        run: |
+          ./scripts/run-docker.sh ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }} --add nodejs-lts,openjdk-17 --android10
+      - name: Shrinking bootstrap as much as possible
+        continue-on-error: true
+        run: |
+          ZIP="$(realpath ./bootstrap-${{ matrix.arch }}.zip)"
+          mkdir tmp && cd tmp
+          unzip $ZIP
+          RM_PATHS="etc/cups etc/fonts include share/man share/doc share/bash-completion share/examples share/fonts share/fontconfig share/cups share/X11 opt/openjdk/legal opt/openjdk/demo opt/openjdk/man"
+          rm -rf $RM_PATHS
+          zip -r bootstrap-${{ matrix.arch }}-shrunk.zip *
+          mv bootstrap-${{ matrix.arch }}-shrunk.zip $(dirname $ZIP)
+          cd ..
+          rm -rf tmp
+      - name: Upload bootstrap-${{ matrix.arch }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: bootstrap-${{ matrix.arch }}
+          path: bootstrap-${{ matrix.arch }}.zip
+      - name: Upload bootstrap-${{ matrix.arch }}-shrunk
+        uses: actions/upload-artifact@v3
+        with:
+          name: bootstrap-${{ matrix.arch }}-shrunk
+          path: bootstrap-${{ matrix.arch }}-shrunk.zip
+  build-apps:
+    strategy:
+      matrix:
+        arch: [aarch64, arm]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v3
+      - name: Patching files
+        run: |
+          echo "::group::downloadBootstrap()"
+          sed -i '/def downloadBootstrap/a return;' app/build.gradle
+          echo "::endgroup::"
+
+          echo "::group::org.gradle.jvmargs"
+          sed -i 's#org.gradle.jvmargs=-Xmx2048M#org.gradle.jvmargs=-Xmx4606M#g' gradle.properties
+          echo "::endgroup::"
+
+          echo '::group::\`.incbin\` calls'
+          if [[ ${{ matrix.arch }} == aarch64 ]]; then
+            OTHER_ARCH="arm"
+          elif [[ ${{ matrix.arch }} == arm ]]; then
+            OTHER_ARCH="aarch64"
+          fi
+          cat <<EOF >app/src/main/cpp/termux-bootstrap-zip.S
+          .global blob
+          .global blob_size
+          .section .rodata
+          blob:
+          #if defined __i686__
+
+          #elif defined __x86_64__
+
+          #elif defined __${{ matrix.arch }}__
+            .incbin "bootstrap-${{ matrix.arch }}.zip"
+          #elif defined __$OTHER_ARCH__
+
+          #else
+          # error Unsupported arch
+          #endif
+          1:
+          blob_size:
+            .int 1b - blob
+          EOF
+          echo "::endgroup::"
+
+          echo "::group::include [archs]"
+
+          if [[ ${{ matrix.arch }} == aarch64 ]]; then
+            ARCH_ALT="arm64-v8a"
+          elif [[ ${{ matrix.arch }} == arm ]]; then
+            ARCH_ALT="armeabi-v7a"
+          fi
+          echo "ARCH_ALT=$ARCH_ALT" >> $GITHUB_ENV
+
+          sed -i "s#include 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'#include '$ARCH_ALT'#g" app/build.gradle
+          echo "::endgroup::"
+
+          echo "::group::abiFilters [archs]"
+          sed -i "s#abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'#abiFilters '$ARCH_ALT'#g" terminal-emulator/build.gradle
+          echo "::endgroup::"
+      - name: Downloading bootstrap
+        uses: actions/download-artifact@v3
+        with:
+          name: bootstrap-${{ matrix.arch }}
+          path: termux-app/app/src/main/cpp
+      - name: Setting variables and build
+        run: |
+          echo "::group::Variables"
+          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+            GITHUB_REF_NAME="v6.9.420"
+          fi
+          RELEASE_VERSION_NAME="$GITHUB_REF_NAME+${GITHUB_SHA:0:7}"
+          APK_DIR_PATH="./app/build/outputs/apk/debug"
+          APK_VERSION_TAG="$RELEASE_VERSION_NAME-$1"
+          APK_BASENAME_PREFIX="revanced-builder_$APK_VERSION_TAG"
+          echo "APK_DIR_PATH=$APK_DIR_PATH" >> $GITHUB_ENV
+          echo "APK_VERSION_TAG=$APK_VERSION_TAG" >> $GITHUB_ENV
+          echo "APK_BASENAME_PREFIX=$APK_BASENAME_PREFIX" >> $GITHUB_ENV
+          export TERMUX_APP_VERSION_NAME="${RELEASE_VERSION_NAME/v/}" 
+          export TERMUX_APK_VERSION_TAG="$APK_VERSION_TAG"
+          export TERMUX_PACKAGE_VARIANT="apt-android-7"
+          echo "::endgroup::"
+          
+          echo "::group::Build"
+          ./gradlew assembleDebug
+          echo "::endgroup::"
+      - name: Upload APK to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.APK_BASENAME_PREFIX }}_${{ env.ARCH_ALT }}
+          path: ${{ env.APK_DIR_PATH }}/${{ env.APK_BASENAME_PREFIX }}_${{ env.ARCH_ALT }}.apk
+
