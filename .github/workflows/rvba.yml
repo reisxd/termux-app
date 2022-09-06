@@ -114,7 +114,7 @@ jobs:
       - name: Setting variables and build
         run: |
           echo "::group::Variables"
-          if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+          if [[ "$GITHUB_REF_NAME" == "master" ]]; then
             GITHUB_REF_NAME="v6.9.420"
           fi
           RELEASE_VERSION_NAME="$GITHUB_REF_NAME+${GITHUB_SHA:0:7}"
