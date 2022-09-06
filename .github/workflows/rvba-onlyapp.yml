@@ -14,7 +14,6 @@ on:
 
 jobs:
   build-apps:
-    needs: build-bootstraps
     strategy:
       matrix:
         arch: [aarch64, arm]
