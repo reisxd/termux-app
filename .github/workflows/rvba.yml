@@ -35,15 +35,15 @@ jobs:
           mv bootstrap-${{ matrix.arch }}-shrunk.zip $(dirname $ZIP)
           cd ..
           rm -rf tmp
-      - name: Upload bootstrap-${{ matrix.arch }}
+      - name: Upload bootstrap-${{ matrix.arch }}-not_shrunk
         uses: actions/upload-artifact@v3
         with:
-          name: bootstrap-${{ matrix.arch }}
+          name: bootstrap-${{ matrix.arch }}-not_shrunk
           path: bootstrap-${{ matrix.arch }}.zip
       - name: Upload bootstrap-${{ matrix.arch }}-shrunk
         uses: actions/upload-artifact@v3
         with:
-          name: bootstrap-${{ matrix.arch }}-shrunk
+          name: bootstrap-${{ matrix.arch }}
           path: bootstrap-${{ matrix.arch }}-shrunk.zip
   build-apps:
     needs: build-bootstraps
@@ -111,7 +111,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: bootstrap-${{ matrix.arch }}
-          path: termux-app/app/src/main/cpp
+          path: app/src/main/cpp
       - name: Setting variables and build
         run: |
           echo "::group::Variables"
@@ -121,7 +121,7 @@ jobs:
           RELEASE_VERSION_NAME="$GITHUB_REF_NAME+${GITHUB_SHA:0:7}"
           APK_DIR_PATH="./app/build/outputs/apk/debug"
           APK_VERSION_TAG="$RELEASE_VERSION_NAME-$1"
-          APK_BASENAME_PREFIX="revanced-builder_$APK_VERSION_TAG"
+          APK_BASENAME_PREFIX="termux-app_$APK_VERSION_TAG"
           echo "APK_DIR_PATH=$APK_DIR_PATH" >> $GITHUB_ENV
           echo "APK_VERSION_TAG=$APK_VERSION_TAG" >> $GITHUB_ENV
           echo "APK_BASENAME_PREFIX=$APK_BASENAME_PREFIX" >> $GITHUB_ENV
