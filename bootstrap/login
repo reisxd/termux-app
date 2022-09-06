@@ -1,0 +1,72 @@
+#!/data/data/com.termux/files/usr/bin/node
+
+const { existsSync } = require('node:fs');
+const https = require('node:https');
+
+console.log('\n\n\n\n\n\n\nWelcome to ReVanced Builder.');
+
+console.log('\n\nThis script will automatically update/install Builder for you,');
+console.log('so please wait!');
+
+function runBuilder() {
+    // Should be pretty self explanatory.
+}
+
+function updateBuilder() {
+    // This function will:
+    /*
+    Download the latest commit using CURL
+    Extract it
+    Move the revanced folder to the temporary folder
+    Delete old Builder
+    Rename the new Builder
+    Move the revanced folder to the new Builder
+    User the runBuilder function.
+    */
+}
+
+if (existsSync('/data/data/com.termux/files/home/revanced-builder')) {
+    // The tool already exists, decide if the app should update it or not.
+
+    let version;
+    try {
+        version = require('/data/data/com.termux/files/home/revanced-builder/wsEvents/checkForUpdates.js').currentVersion;
+    } catch (e) {
+        // Thats weird...
+
+        console.log(`\nAn error occured while fetching the current version:\n${e.stack}`);
+    }
+
+    // Check the current version of Builder using GH API 
+    const options = {
+        hostname: 'api.github.com',
+        port: 443,
+        path: '/repos/reisxd/revanced-builder/releases/latest',
+        method: 'GET',
+    };
+
+    let body;
+    const req = https.request(options, res => {
+        console.log(`statusCode: ${res.statusCode}`);
+
+        res.on('data', d => {
+            body = JSON.parse(d.toString());
+        });
+    });
+
+    req.on('error', error => {
+        console.error(error);
+    });
+
+    req.end();
+
+    if (version === body.tag_name) {
+        // Here, it should run builder with the --no-open to prevent Builder from opening an browser
+    } else {
+        // Update Builder.
+    }
+} else {
+    // Install Builder.
+
+    console.log('Installing ReVanced Builder...')
+}
