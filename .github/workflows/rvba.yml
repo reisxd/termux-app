@@ -111,7 +111,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: bootstrap-${{ matrix.arch }}
-          path: app/src/main/cpp
+          path: ./app/src/main/cpp
       - name: Setting variables and build
         run: |
           echo "::group::Variables"
@@ -128,6 +128,8 @@ jobs:
           export TERMUX_APP_VERSION_NAME="${RELEASE_VERSION_NAME/v/}" 
           export TERMUX_APK_VERSION_TAG="$APK_VERSION_TAG"
           export TERMUX_PACKAGE_VARIANT="apt-android-7"
+          
+          unzip -l ./app/src/main/cpp/bootstrap-${{ matrix.arch }}.zip
           echo "::endgroup::"
           
           echo "::group::Build"
