@@ -22,6 +22,7 @@ jobs:
       - name: Build bootstrap for ${{ matrix.arch }}
         run: |
           ./scripts/run-docker.sh ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }} --add nodejs-lts,openjdk-17 --android10
+          unzip -l bootstrap-${{ matrix.arch }}.zip | grep SYMLINKS.txt
       - name: Shrinking bootstrap as much as possible
         continue-on-error: true
         run: |
