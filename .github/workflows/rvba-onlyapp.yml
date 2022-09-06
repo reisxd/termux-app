@@ -1,49 +1,18 @@
-name: "[Alpha] Build RVBA"
+name: "[Alpha] Build RVBA (prebuilt bootstrap)"
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      aarch64:
+        description: Artifact ID for aarch64 bootstrap
+        required: true
+        default: ''
+      arm:
+        description: Artifact ID for arm bootstrap
+        required: true
+        default: ''
 
 jobs:
-  build-bootstraps:
-    strategy:
-      matrix:
-        arch: [aarch64, arm]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout termux-packages
-        uses: actions/checkout@v3
-        with:
-          repository: 'termux/termux-packages'
-      - name: Patch generate script
-        run: |
-          PKGS_TO_REMOVE='bzip2 proot diffutils findutils gawk grep less procps psmisc sed tar termux-keyring nano util-linux xz-utils ed debianutils dos2unix inetutils lsof net-tools patch'
-          for pkg in $PKGS_TO_REMOVE; do
-            sed -i "s@pull_package $pkg@echo \"$pkg, take a huge L\"@g" ./scripts/generate-bootstraps.sh
-          done
-      - name: Build bootstrap for ${{ matrix.arch }}
-        run: |
-          ./scripts/run-docker.sh ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }} --add nodejs-lts,openjdk-17 --android10
-      - name: Shrinking bootstrap as much as possible
-        continue-on-error: true
-        run: |
-          ZIP="$(realpath ./bootstrap-${{ matrix.arch }}.zip)"
-          mkdir tmp && cd tmp
-          unzip $ZIP
-          RM_PATHS="etc/cups etc/fonts include share/man share/doc share/bash-completion share/examples share/fonts share/fontconfig share/cups share/X11 opt/openjdk/legal opt/openjdk/demo opt/openjdk/man"
-          rm -rf $RM_PATHS
-          zip -r bootstrap-${{ matrix.arch }}-shrunk.zip *
-          mv bootstrap-${{ matrix.arch }}-shrunk.zip $(dirname $ZIP)
-          cd ..
-          rm -rf tmp
-      - name: Upload bootstrap-${{ matrix.arch }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: bootstrap-${{ matrix.arch }}
-          path: bootstrap-${{ matrix.arch }}.zip
-      - name: Upload bootstrap-${{ matrix.arch }}-shrunk
-        uses: actions/upload-artifact@v3
-        with:
-          name: bootstrap-${{ matrix.arch }}-shrunk
-          path: bootstrap-${{ matrix.arch }}-shrunk.zip
   build-apps:
     needs: build-bootstraps
     strategy:
@@ -106,11 +75,16 @@ jobs:
           echo "::group::abiFilters [archs]"
           sed -i "s#abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'#abiFilters '$ARCH_ALT'#g" terminal-emulator/build.gradle
           echo "::endgroup::"
-      - name: Downloading bootstrap
-        uses: actions/download-artifact@v3
-        with:
-          name: bootstrap-${{ matrix.arch }}
-          path: termux-app/app/src/main/cpp
+      - name: Download bootstrap
+        run: |
+          if [[ ${{ matrix.arch }} == aarch64 ]]; then
+            ID=${{ inputs.aarch64 }}
+          elif [[ ${{ matrix.arch }} == arm ]]; then
+            ID=${{ inputs.arm }}
+          fi
+          URL="https://api.github.com/repos/reisxd/termux-app/actions/artifacts/$ID/zip"
+          curl -Lo ~/bootstrap-${{ matrix.arch }}.zip -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$URL"
+          cp ~/bootstrap-${{ matrix.arch }}.zip app/src/main/cpp
       - name: Setting variables and build
         run: |
           echo "::group::Variables"
