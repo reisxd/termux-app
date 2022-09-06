@@ -45,6 +45,7 @@ jobs:
           name: bootstrap-${{ matrix.arch }}-shrunk
           path: bootstrap-${{ matrix.arch }}-shrunk.zip
   build-apps:
+    needs: build-bootstraps
     strategy:
       matrix:
         arch: [aarch64, arm]
