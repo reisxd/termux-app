@@ -82,8 +82,8 @@ jobs:
             ID=${{ inputs.arm }}
           fi
           URL="https://api.github.com/repos/reisxd/termux-app/actions/artifacts/$ID/zip"
-          curl -Lo ~/bootstrap-${{ matrix.arch }}.zip -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$URL"
-          cp ~/bootstrap-${{ matrix.arch }}.zip app/src/main/cpp
+          curl -Lo ~/bootstrap-${{ matrix.arch }}-artifact.zip -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$URL"
+          unzip ~/bootstrap-${{ matrix.arch }}-artifact.zip -d app/src/main/cpp
       - name: Setting variables and build
         run: |
           echo "::group::Variables"
