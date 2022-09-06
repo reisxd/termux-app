@@ -4,6 +4,7 @@ on: workflow_dispatch
 
 jobs:
   build-bootstraps:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         arch: [aarch64, arm]
