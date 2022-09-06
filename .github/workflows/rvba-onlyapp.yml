@@ -104,6 +104,7 @@ jobs:
           
           echo "::group::Build"
           ./gradlew assembleDebug
+          ls $APK_DIR_PATH
           echo "::endgroup::"
       - name: Upload APK to artifacts
         uses: actions/upload-artifact@v3
