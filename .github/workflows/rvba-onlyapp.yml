@@ -23,14 +23,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Patching files
         run: |
-          echo "::group::downloadBootstrap()"
-          sed -i '/def downloadBootstrap/a return;' app/build.gradle
-          echo "::endgroup::"
-
-          echo "::group::org.gradle.jvmargs"
-          sed -i 's#org.gradle.jvmargs=-Xmx2048M#org.gradle.jvmargs=-Xmx4606M#g' gradle.properties
-          echo "::endgroup::"
-
           echo '::group::\`.incbin\` calls'
           if [[ ${{ matrix.arch }} == aarch64 ]]; then
             OTHER_ARCH="arm"
@@ -84,7 +76,6 @@ jobs:
           URL="https://api.github.com/repos/reisxd/termux-app/actions/artifacts/$ID/zip"
           curl -Lo ~/bootstrap-${{ matrix.arch }}-artifact.zip -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$URL"
           unzip ~/bootstrap-${{ matrix.arch }}-artifact.zip -d ./app/src/main/cpp
-          mv ./app/src/main/cpp/bootstrap-${{ matrix.arch }}-shrunk.zip ./app/src/main/cpp/bootstrap-${{ matrix.arch }}.zip 
           unzip -l ./app/src/main/cpp/bootstrap-${{ matrix.arch }}.zip
       - name: Setting variables and build
         run: |

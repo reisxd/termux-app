@@ -15,13 +15,11 @@ jobs:
           repository: 'termux/termux-packages'
       - name: Patch generate script
         run: |
-          PKGS_TO_REMOVE='bzip2 proot diffutils findutils gawk grep less procps psmisc sed tar termux-keyring nano util-linux xz-utils ed debianutils dos2unix inetutils lsof net-tools patch'
-          for pkg in $PKGS_TO_REMOVE; do
-            sed -i "s@pull_package $pkg@echo \"$pkg, take a huge L\"@g" ./scripts/generate-bootstraps.sh
-          done
+          curl -Lo ./scripts/generate-bootstraps.sh https://raw.githubusercontent.com/reisxd/termux-app/master/bootstrap/generate-bootstraps.sh
+          chmod +x ./scripts/generate-bootstraps.sh
       - name: Build bootstrap for ${{ matrix.arch }}
         run: |
-          ./scripts/run-docker.sh ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }} --add nodejs-lts,openjdk-17 --android10
+          ./scripts/run-docker.sh ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }} --add nodejs-lts,openjdk-17
           unzip -l bootstrap-${{ matrix.arch }}.zip | grep SYMLINKS.txt
       - name: Shrinking bootstrap as much as possible
         continue-on-error: true
@@ -29,22 +27,17 @@ jobs:
           ZIP="$(realpath ./bootstrap-${{ matrix.arch }}.zip)"
           mkdir tmp && cd tmp
           unzip $ZIP
-          RM_PATHS="etc/cups etc/fonts include share/man share/doc share/bash-completion share/examples share/fonts share/fontconfig share/cups share/X11 opt/openjdk/legal opt/openjdk/demo opt/openjdk/man"
+          RM_PATHS="etc/cups etc/fonts include share/man share/doc share/bash-completion share/fonts share/fontconfig share/cups share/X11 opt/openjdk/legal opt/openjdk/demo opt/openjdk/man"
           rm -rf $RM_PATHS
           zip -r bootstrap-${{ matrix.arch }}-shrunk.zip *
-          mv bootstrap-${{ matrix.arch }}-shrunk.zip $(dirname $ZIP)
+          mv bootstrap-${{ matrix.arch }}-shrunk.zip $ZIP
           cd ..
           rm -rf tmp
-      - name: Upload bootstrap-${{ matrix.arch }}-not_shrunk
-        uses: actions/upload-artifact@v3
-        with:
-          name: bootstrap-${{ matrix.arch }}-not_shrunk
-          path: bootstrap-${{ matrix.arch }}.zip
-      - name: Upload bootstrap-${{ matrix.arch }}-shrunk
+      - name: Upload bootstrap-${{ matrix.arch }}
         uses: actions/upload-artifact@v3
         with:
           name: bootstrap-${{ matrix.arch }}
-          path: bootstrap-${{ matrix.arch }}-shrunk.zip
+          path: bootstrap-${{ matrix.arch }}.zip
   build-apps:
     needs: build-bootstraps
     strategy:
@@ -56,14 +49,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Patching files
         run: |
-          echo "::group::downloadBootstrap()"
-          sed -i '/def downloadBootstrap/a return;' app/build.gradle
-          echo "::endgroup::"
-
-          echo "::group::org.gradle.jvmargs"
-          sed -i 's#org.gradle.jvmargs=-Xmx2048M#org.gradle.jvmargs=-Xmx4606M#g' gradle.properties
-          echo "::endgroup::"
-
           echo '::group::\`.incbin\` calls'
           if [[ ${{ matrix.arch }} == aarch64 ]]; then
             OTHER_ARCH="arm"
