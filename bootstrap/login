@@ -89,6 +89,7 @@ if (existsSync('/data/data/com.termux/files/home/revanced-builder')) {
         res.once('end', () => {
             req.end();
             body = JSON.parse(body);
+            checkForUpdates(version, body);
         });
     });
 
@@ -97,9 +98,6 @@ if (existsSync('/data/data/com.termux/files/home/revanced-builder')) {
     });
 
     req.end();
-
-    checkForUpdates(version, body);
-
 } else {
     // Install Builder.
 
