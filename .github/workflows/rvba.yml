@@ -53,10 +53,6 @@ jobs:
           sed -i '/def downloadBootstrap/a return;' app/build.gradle
           echo "::endgroup::"
 
-          echo "::group::org.gradle.jvmargs"
-          sed -i 's#org.gradle.jvmargs=-Xmx2048M#org.gradle.jvmargs=-Xmx4606M#g' gradle.properties
-          echo "::endgroup::"
-
           echo '::group::\`.incbin\` calls'
           if [[ ${{ matrix.arch }} == aarch64 ]]; then
             OTHER_ARCH="arm"
