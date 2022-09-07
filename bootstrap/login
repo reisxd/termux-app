@@ -17,7 +17,7 @@ async function runBuilder() {
     await exec(`cd ${process.env.HOME}/revanced-builder && node . --no-open`);
 }
 
-async function installBuilder () {
+async function installBuilder() {
     // This is required to make stuff like JDK, NPM etc. work.
     await exec(`chmod -R 0777 /data/data/com.termux/files/usr`);
     await exec(`curl -sLo ${process.env.HOME}/builder.zip https://github.com/reisxd/revanced-builder/archive/refs/heads/main.zip`);
@@ -34,6 +34,23 @@ async function updateBuilder() {
     await exec(`mv ${process.env.HOME}/revanced-builder-main ${process.env.HOME}/revanced-builder`);
     await exec(`cd ${process.env.HOME}/revanced-builder && npm i`);
     await exec(`cp -r ${process.env.HOME}/rvba_temp ${process.env.HOME}/revanced-builder/revanced && rm -r ${process.env.HOME}/rvba_temp`);
+}
+
+async function checkForUpdates(version, body) {
+    if (version === body.tag_name) {
+        // Run Builder.
+        (async () => {
+            console.log('Running ReVanced Builder...');
+            await runBuilder();
+        })();
+    } else {
+        (async () => {
+            console.log('Updating ReVanced Builder...');
+            await updateBuilder();
+            console.log('Running ReVanced Builder...');
+            await runBuilder();
+        })();
+    }
 }
 
 if (existsSync('/data/data/com.termux/files/home/revanced-builder')) {
@@ -54,14 +71,24 @@ if (existsSync('/data/data/com.termux/files/home/revanced-builder')) {
         port: 443,
         path: '/repos/reisxd/revanced-builder/releases/latest',
         method: 'GET',
+        agent: https.Agent({ keepAlive: true }),
+        headers: {
+            'User-Agent': 'ReVanced-Builder-Android',
+            'Content-Type': 'application/vnd.github+json'
+        },
     };
 
-    let body;
+    let body = '';
     const req = https.request(options, res => {
         console.log(`The response from the GH API: ${res.statusCode}`);
 
-        res.on('data', d => {
-            body = JSON.parse(d.toString());
+        res.on('data', (data) => {
+            body += data.toString();
+        });
+
+        res.once('end', () => {
+            req.end();
+            body = JSON.parse(body);
         });
     });
 
@@ -71,26 +98,14 @@ if (existsSync('/data/data/com.termux/files/home/revanced-builder')) {
 
     req.end();
 
-    if (version === body.tag_name) {
-        // Run Builder.
-        (async() => {
-            console.log('Running ReVanced Builder...');
-            await runBuilder();
-        })();
-    } else {
-        (async() => {
-            console.log('Updating ReVanced Builder...');
-            await updateBuilder();
-            console.log('Running ReVanced Builder...');
-            await runBuilder();
-        })();
-    }
+    checkForUpdates(version, body);
+
 } else {
     // Install Builder.
 
     console.log('Installing ReVanced Builder...');
 
-    (async() => {
+    (async () => {
         await installBuilder();
         console.log('Running ReVanced Builder...');
         await runBuilder();
