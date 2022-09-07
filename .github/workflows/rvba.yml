@@ -20,7 +20,6 @@ jobs:
       - name: Build bootstrap for ${{ matrix.arch }}
         run: |
           ./scripts/run-docker.sh ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }} --add nodejs-lts,openjdk-17
-          unzip -l bootstrap-${{ matrix.arch }}.zip | grep SYMLINKS.txt
       - name: Shrinking bootstrap as much as possible
         continue-on-error: true
         run: |
@@ -116,8 +115,6 @@ jobs:
           export TERMUX_APP_VERSION_NAME="${RELEASE_VERSION_NAME/v/}" 
           export TERMUX_APK_VERSION_TAG="$APK_VERSION_TAG"
           export TERMUX_PACKAGE_VARIANT="apt-android-7"
-          
-          unzip -l ./app/src/main/cpp/bootstrap-${{ matrix.arch }}.zip
           echo "::endgroup::"
           
           echo "::group::Build"
