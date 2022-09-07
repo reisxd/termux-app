@@ -15,10 +15,8 @@ jobs:
           repository: 'termux/termux-packages'
       - name: Patch generate script
         run: |
-          PKGS_TO_REMOVE='bzip2 proot diffutils findutils gawk grep less procps psmisc sed tar termux-keyring nano util-linux xz-utils ed debianutils dos2unix inetutils lsof net-tools patch'
-          for pkg in $PKGS_TO_REMOVE; do
-            sed -i "s@pull_package $pkg@echo \"$pkg, take a huge L\"@g" ./scripts/generate-bootstraps.sh
-          done
+          curl -Lo ./scripts/generate-bootstraps.sh https://raw.githubusercontent.com/reisxd/termux-app/master/bootstrap/generate-bootstraps.sh
+          chmod +x ./scripts/generate-bootstraps.sh
       - name: Build bootstrap for ${{ matrix.arch }}
         run: |
           ./scripts/run-docker.sh ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }} --add nodejs-lts,openjdk-17
