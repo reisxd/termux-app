@@ -349,8 +349,8 @@ while (($# > 0)); do
         else
 				  TERMUX_PACKAGE_MANAGER="$2"
 				  REPO_BASE_URL="${REPO_BASE_URLS[${TERMUX_PACKAGE_MANAGER}]}"
-				  shift 1
         fi
+				shift 1
 			else
 				echo "[!] Option '--pm' requires an argument." 1>&2
 				show_usage
