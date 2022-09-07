@@ -19,7 +19,8 @@ async function runBuilder() {
 
 async function installBuilder() {
     // This is required to make stuff like JDK, NPM etc. work.
-    await exec(`chmod -R 0777 /data/data/com.termux/files/usr`);
+    await exec('chmod -R 0777 /data/data/com.termux/files/usr');
+    await exec('termux-setup-storage');
     await exec(`curl -sLo ${process.env.HOME}/builder.zip https://github.com/reisxd/revanced-builder/archive/refs/heads/main.zip`);
     await exec(`unzip ${process.env.HOME}/builder.zip`);
     await exec(`mv ${process.env.HOME}/revanced-builder-main ${process.env.HOME}/revanced-builder`);
