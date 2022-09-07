@@ -27,7 +27,7 @@ jobs:
           ZIP="$(realpath ./bootstrap-${{ matrix.arch }}.zip)"
           mkdir tmp && cd tmp
           unzip $ZIP
-          RM_PATHS="etc/cups etc/fonts include share/man share/doc share/bash-completion share/examples share/fonts share/fontconfig share/cups share/X11 opt/openjdk/legal opt/openjdk/demo opt/openjdk/man"
+          RM_PATHS="etc/cups etc/fonts include share/man share/doc share/bash-completion share/fonts share/fontconfig share/cups share/X11 opt/openjdk/legal opt/openjdk/demo opt/openjdk/man"
           rm -rf $RM_PATHS
           zip -r bootstrap-${{ matrix.arch }}-shrunk.zip *
           mv bootstrap-${{ matrix.arch }}-shrunk.zip $ZIP
