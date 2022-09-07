@@ -19,7 +19,7 @@ jobs:
           chmod +x ./scripts/generate-bootstraps.sh
       - name: Build bootstrap for ${{ matrix.arch }}
         run: |
-          ./scripts/run-docker.sh ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }} --add nodejs-lts,openjdk-17
+          ./scripts/run-docker.sh ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }} --add nodejs-lts,openjdk-17 --pm null
       - name: Shrinking bootstrap as much as possible
         continue-on-error: true
         run: |
