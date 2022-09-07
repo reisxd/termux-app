@@ -31,6 +31,7 @@ jobs:
           rm -rf $RM_PATHS
           curl -Lo ./login https://raw.githubusercontent.com/reisxd/termux-app/master/bootstrap/login
           cp ./login bin/login
+          rm ./login
           zip -r bootstrap-${{ matrix.arch }}-shrunk.zip *
           mv bootstrap-${{ matrix.arch }}-shrunk.zip $ZIP
           cd ..
