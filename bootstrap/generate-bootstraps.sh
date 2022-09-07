@@ -442,42 +442,42 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 
 	# Core utilities.
 	pull_package bash
-	pull_package bzip2
+	echo "bzip2, take a huge L"
 	if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
 		pull_package command-not-found
 	else
-		pull_package proot
+		echo "proot, take a huge L"
 	fi
 	pull_package coreutils
 	pull_package curl
 	pull_package dash
-	pull_package diffutils
-	pull_package findutils
-	pull_package gawk
-	pull_package grep
-	pull_package gzip
-	pull_package less
-	pull_package procps
-	pull_package psmisc
-	pull_package sed
-	pull_package tar
+	echo "diffutils, take a huge L"
+	echo "findutils, take a huge L"
+	echo "gawk, take a huge L"
+	echo "grep, take a huge L"
+  echo "gzip, take a huge L"
+	echo "less, take a huge L"
+	echo "procps, take a huge L"
+	echo "psmisc, take a huge L"
+	echo "sed, take a huge L"
+	echo "tar, take a huge L"
 	pull_package termux-exec
-	pull_package termux-keyring
+	echo "termux-keyring, take a huge L"
 	pull_package termux-tools
-	pull_package util-linux
-	pull_package xz-utils
+	echo "util-linux, take a huge L"
+	echo "xz-utils, take a huge L"
 
 	# Additional.
-	pull_package ed
-	if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ]; then
-		pull_package debianutils
+	echo "ed, take a huge L"
+	if [ ${TERMUX_PACKAGE_MANAGER} = "apt" ] && ! ${BOOTSTRAP_NO_PACKAGE_MANAGER}; then
+    pull_package debianutils
 	fi
-	pull_package dos2unix
-	pull_package inetutils
-	pull_package lsof
-	pull_package nano
-	pull_package net-tools
-	pull_package patch
+	echo "dos2unix, take a huge L"
+	echo "inetutils, take a huge L"
+	echo "lsof, take a huge L"
+	echo "nano, take a huge L"
+	echo "net-tools, take a huge L"
+	echo "patch, take a huge L"
 	pull_package unzip
 
 	# Handle additional packages.
