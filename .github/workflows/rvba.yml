@@ -49,10 +49,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Patching files
         run: |
-          echo "::group::downloadBootstrap()"
-          sed -i '/def downloadBootstrap/a return;' app/build.gradle
-          echo "::endgroup::"
-
           echo '::group::\`.incbin\` calls'
           if [[ ${{ matrix.arch }} == aarch64 ]]; then
             OTHER_ARCH="arm"
