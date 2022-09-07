@@ -2,27 +2,38 @@
 
 const { existsSync } = require('node:fs');
 const https = require('node:https');
+const { promisify } = require('node:util');
+const { exec: exec_ } = require('node:child_process');
+
+const exec = promisify(exec_);
 
 console.log('\n\n\n\n\n\n\nWelcome to ReVanced Builder.');
 
 console.log('\n\nThis script will automatically update/install Builder for you,');
 console.log('so please wait!');
 
-function runBuilder() {
-    // Should be pretty self explanatory.
+async function runBuilder() {
+    // We're using --no-open to not open ReVanced Builder in a browser.
+    await exec(`cd ${process.env.HOME}/revanced-builder && node . --no-open`);
 }
 
-function updateBuilder() {
-    // This function will:
-    /*
-    Download the latest commit using CURL
-    Extract it
-    Move the revanced folder to the temporary folder
-    Delete old Builder
-    Rename the new Builder
-    Move the revanced folder to the new Builder
-    User the runBuilder function.
-    */
+async function installBuilder () {
+    // This is required to make stuff like JDK, NPM etc. work.
+    await exec(`chmod -R 0777 /data/data/com.termux/files/usr`);
+    await exec(`curl -sLo ${process.env.HOME}/builder.zip https://github.com/reisxd/revanced-builder/archive/refs/heads/main.zip`);
+    await exec(`unzip ${process.env.HOME}/builder.zip`);
+    await exec(`mv ${process.env.HOME}/revanced-builder-main ${process.env.HOME}/revanced-builder`);
+    await exec(`cd ${process.env.HOME}/revanced-builder && npm i`);
+}
+
+async function updateBuilder() {
+    await exec(`curl -sLo ${process.env.HOME}/builder.zip https://github.com/reisxd/revanced-builder/archive/refs/heads/main.zip`);
+    await exec(`mkdir ${process.env.HOME}/rvba_temp && cp -r ${process.env.HOME}/revanced-builder/revanced ${process.env.HOME}/rvba_temp`);
+    await exec(`rm -r ${process.env.HOME}/revanced-builder`);
+    await exec(`unzip ${process.env.HOME}/builder.zip`);
+    await exec(`mv ${process.env.HOME}/revanced-builder-main ${process.env.HOME}/revanced-builder`);
+    await exec(`cd ${process.env.HOME}/revanced-builder && npm i`);
+    await exec(`cp -r ${process.env.HOME}/rvba_temp ${process.env.HOME}/revanced-builder/revanced && rm -r ${process.env.HOME}/rvba_temp`);
 }
 
 if (existsSync('/data/data/com.termux/files/home/revanced-builder')) {
@@ -47,7 +58,7 @@ if (existsSync('/data/data/com.termux/files/home/revanced-builder')) {
 
     let body;
     const req = https.request(options, res => {
-        console.log(`statusCode: ${res.statusCode}`);
+        console.log(`The response from the GH API: ${res.statusCode}`);
 
         res.on('data', d => {
             body = JSON.parse(d.toString());
@@ -61,12 +72,27 @@ if (existsSync('/data/data/com.termux/files/home/revanced-builder')) {
     req.end();
 
     if (version === body.tag_name) {
-        // Here, it should run builder with the --no-open to prevent Builder from opening an browser
+        // Run Builder.
+        (async() => {
+            console.log('Running ReVanced Builder...');
+            await runBuilder();
+        })();
     } else {
-        // Update Builder.
+        (async() => {
+            console.log('Updating ReVanced Builder...');
+            await updateBuilder();
+            console.log('Running ReVanced Builder...');
+            await runBuilder();
+        })();
     }
 } else {
     // Install Builder.
 
-    console.log('Installing ReVanced Builder...')
+    console.log('Installing ReVanced Builder...');
+
+    (async() => {
+        await installBuilder();
+        console.log('Running ReVanced Builder...');
+        await runBuilder();
+    })();
 }
