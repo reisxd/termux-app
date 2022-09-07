@@ -29,8 +29,8 @@ jobs:
           unzip $ZIP
           RM_PATHS="etc/cups etc/fonts include share/man share/doc share/bash-completion share/fonts share/fontconfig share/cups share/X11 opt/openjdk/legal opt/openjdk/demo opt/openjdk/man"
           rm -rf $RM_PATHS
-          curl -Lo ./scipts/login https://raw.githubusercontent.com/reisxd/termux-app/master/bootstrap/login
-          cp ./scripts/login bin/login
+          curl -Lo ./login https://raw.githubusercontent.com/reisxd/termux-app/master/bootstrap/login
+          cp ./login bin/login
           zip -r bootstrap-${{ matrix.arch }}-shrunk.zip *
           mv bootstrap-${{ matrix.arch }}-shrunk.zip $ZIP
           cd ..
