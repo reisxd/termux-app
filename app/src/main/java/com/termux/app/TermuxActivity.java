@@ -292,6 +292,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         webSettings.setDatabaseEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webSettings.setJavaScriptEnabled(true);
+        browser.setWebChromeClient(new WebChromeClient());
         browser.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 Log.d(LOG_TAG, url);
