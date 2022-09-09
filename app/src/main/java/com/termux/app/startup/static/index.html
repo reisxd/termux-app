@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReVanced Builder</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+  <script>eruda.init();</script>
+  <script src="./index.js" async></script>
+<body>
+  <div id="container">
+    <main>
+      <header>
+        <h1 id="head">Welcome to ReVanced Builder</h1>
+        <span id="desc">Select one of the options to continue.</span>
+      </header>
+      <div id="content--wrapper">
+        <div id="content">
+          <div id="home">
+            <div><button onclick="run();" class="highlighted action">Run</button></div>
+            <div><button onclick="reinstall();" class="action">Reinstall</button></div>
+            <div><button onclick="update();" class="action">Update</button></div>
+            <div><button onclick="about();" class="action">About</button></div>
+          </div>
+          <div id="next-step">
+            <div id="log"></div>
+          </div>
+          <div id="about">
+            <ul>
+              <li>
+                <h4>Original UI Design</h4>
+                <div class="members">
+                  <span class="member">
+                    <span class="member-image sn"></span>
+                    <span class="member-name"
+                      ><a href="https://github.com/baiorett">sn</a></span
+                    >
+                  </span>
+                  <span class="member">
+                    <span class="member-image afn"></span>
+                    <span class="member-name"
+                      ><a href="https://github.com/afnzmn">afn</a></span
+                    >
+                  </span>
+                  <span class="member">
+                    <span class="member-image"></span>
+                    <span class="member-name"
+                      ><a
+                        href="https://www.figma.com/file/p9tO8LyUuPaovZ5tz40TzH/ReVanced-Desktop"
+                        >Original UI</a
+                      ></span
+                    >
+                  </span>
+                </div>
+              </li>
+              <li>
+                <h4>HTML UI Design</h4>
+                <div class="members">
+                  <span class="member">
+                    <span class="member-image elijah629"></span>
+                    <span class="member-name"
+                      ><a href="https://github.com/Elijah629"
+                        >Elijah629</a
+                      ></span
+                    >
+                  </span>
+                </div>
+              </li>
+              <li>
+                <h4>
+                  <a href="https://github.com/reisxd/revanced-builder"
+                    >ReVanced Builder</a
+                  >
+                </h4>
+                <div class="members" id="revanced-builder"></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <button id="goToHome" onclick="goToHome();">Go to Home</button>
+      <button onclick="exit();">Exit</button>
+    </footer>
+  </div>
+</body>
+</html>
