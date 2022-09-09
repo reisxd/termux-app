@@ -1,6 +1,4 @@
-const WS_URI = `${window?.location?.protocol === 'https:' ? 'wss' : 'ws'}://${
-  window?.location?.host ?? 'localhost:8080'
-}`;
+const WS_URI = `${window?.location?.protocol === 'https:' ? 'wss' : 'ws'}://localhost:69143`;
 const ws = new WebSocket(WS_URI);
 
 let lastPage = "home";
