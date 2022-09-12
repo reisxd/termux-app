@@ -43,13 +43,14 @@ public final Actions {
     } else return false;
   }
 
-  class DLoadRVB extends AsyncTask<Void, String, String> {
+  class DLoadRVB extends AsyncTask<WebSocket, String, String> {
     @Override
-    protected String doInBackground() {
+    protected String doInBackground(WebSocket... ws) {
       try{
         int count = 0;
         URL url = new URL("https://github.com/reisxd/revanced-builder/archive/refs/heads/main.zip");
         URLConnection conn = url.openConnection();
+        send(ws[0], "info", "Downloading ReVanced Builder");
         conn.connect();
         int fileSize = conn.getContentLength();
         InputStream i = new BufferedInputStream(url.openStream(), 8192);
@@ -67,7 +68,7 @@ public final Actions {
       } catch (Exception e) {
           StringWriter sw = new StringWriter();
           e.printStackTrace(new PrintWriter(sw));
-          send(ws, "error", "Error while downloading revanced-builder.zip!\n" + sw.toString());
+          send(ws[0], "error", "Error while downloading revanced-builder.zip!\n" + sw.toString());
       }
       return null;
     }
