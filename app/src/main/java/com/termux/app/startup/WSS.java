@@ -13,9 +13,11 @@ import com.termux.app.startup.Actions;
 
 public class WSS extends WebSocketServer {
   private static final String TAG = "RVBA_Startup:WSS";
+  private Context context;
 
-  public WSS(InetSocketAddress address) {
+  public WSS(InetSocketAddress address, Context context) {
     super(address);
+    this.context = context;
   }
   
   @Override
@@ -36,7 +38,7 @@ public class WSS extends WebSocketServer {
     String action = msgJson.get("action");
     switch(action) {
       case "preflight":
-        Actions.preflight();
+        Actions.preflight(context, c);
         break;
       case "run":
         Actions.run();
