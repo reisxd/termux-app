@@ -95,6 +95,7 @@ public class Actions {
 
   private static boolean installRvb(Context c, WebSocket ws) {
     new DLoadRVB().execute(ws);
+    send(ws, "success", "Downloaded!");
 
     send(ws, "info", "Unzipping revanced-builder.zip");
     File homeDirFile = new File(TERMUX_HOME_DIR_PATH);
@@ -128,6 +129,7 @@ public class Actions {
         send(ws, "error", "Error while unzipping revanced-builder.zip!\n" + sw.toString());
         return false;
     }
+    send(ws, "success", "Unzipped!");
 
     if (!(new File(Paths.get(homeDirFile, "revanced-builder-main"))).renameTo(RVB_LOCATION)) {
       send(ws, "error", "Error while renaming revanced-builder-main to revanced-buiilder!");
@@ -139,6 +141,8 @@ public class Actions {
     if(new Boolean(npmExecResult.get("isError"))) {
       send(ws, "error", "Error while installing packages!\n\nStderr:\n" + npmExecResult.get("stderr"));
       return false;
+    } else {
+      send(ws, "success", "Packages installed!");
     }
 
     return true;
