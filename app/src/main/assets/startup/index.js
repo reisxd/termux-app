@@ -25,6 +25,7 @@ function switchTo(page) {
 function run() {
   switchTo("next-step");
   changeHeader("Preflight", "Checking if ReVanced Builder is installed");
+  ws.send(JSON.stringify({ action: "preflight" }));
 }
 
 function reinstall() {
