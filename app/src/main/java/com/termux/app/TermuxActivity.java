@@ -203,17 +203,6 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
     private static final String LOG_TAG = "TermuxActivity";
 
-    private static int findFreePort() {
-        for (int p = 8000; p < 8080; p++) {
-            try (ServerSocket socket = new ServerSocket(p)) {
-                socket.setReuseAddress(true);
-            } catch (IOException _) {
-                continue;
-            }
-                return p;
-        }
-        throw new RuntimeException("Could not find a free port");
-    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Logger.logDebug(LOG_TAG, "onCreate");
@@ -326,6 +315,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             }
         });
         // browser.loadData("<html><body></body><style> body { background-color: #1b1e29 } </style><script>let ws = new WebSocket('ws://localhost:" + portS + "');ws.onopen = () => window.open(\"http://localhost:" + portS + "\", \"_self\"); setInterval(() => { ws = new WebSocket('ws://localhost:" + portS + "'); ws.onopen = () => window.open(\"http://localhost:" + portS + "\", \"_self\"); }, 3000);</script></html>", "text/html; charset=utf-8", "UTF-8");
+        new WSS("http://localhost:69143", this);
         browser.loadUrl("file:///android_asset/startup/index.html");
     }
 
