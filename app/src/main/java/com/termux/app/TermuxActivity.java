@@ -63,6 +63,7 @@ import com.termux.shared.termux.settings.properties.TermuxAppSharedProperties;
 import com.termux.shared.termux.theme.TermuxThemeUtils;
 import com.termux.shared.theme.NightMode;
 import com.termux.shared.view.ViewUtils;
+import com.termux.startup.WSS;
 import com.termux.terminal.TerminalSession;
 import com.termux.terminal.TerminalSessionClient;
 import com.termux.view.TerminalView;
@@ -288,8 +289,6 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         // Send the {@link TermuxConstants#BROADCAST_TERMUX_OPENED} broadcast to notify apps that Termux
         // app has been opened.
         TermuxUtils.sendTermuxOpenedBroadcast(this);
-        int port = findFreePort();
-        String portS = String.valueOf(port);
         WebView browser = (WebView) findViewById(R.id.webview);
         browser.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
         WebSettings webSettings = browser.getSettings();

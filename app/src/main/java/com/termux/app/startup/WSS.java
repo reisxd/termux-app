@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -35,9 +36,9 @@ public class WSS extends WebSocketServer {
   @Override
   public void onMessage(WebSocket c, String msg) {
     // We assume its a JSON string.
-    Log.logDebug(TAG, "Received message from " + c.getRemoteSocketAddress() + ":\n" + msg);
+    Logger.logDebug(TAG, "Received message from " + c.getRemoteSocketAddress() + ":\n" + msg);
     JSONObject msgJson = new JSONObject(msg);
-    String action = msgJson.get("action");
+    String action = msgJson.get("action").toString();
     switch(action) {
       case "preflight":
         Actions.preflight(context, c);
