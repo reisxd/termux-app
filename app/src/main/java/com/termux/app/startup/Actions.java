@@ -75,7 +75,7 @@ public class Actions {
         long total = 0;
         while((count = i.read(data)) != -1) {
           total += count;
-          publishProgress(new Object[] {ws, "" + (int) ((total * 100) / fileSize)});
+          publishProgress(ws, "" + (int) ((total * 100) / fileSize));
           o.write(data, 0, count);
         }
         o.flush();
@@ -108,7 +108,7 @@ public class Actions {
       ZipEntry ze = zis.getNextEntry();
       while(ze != null) {
         String fn = ze.getName();
-        File newFile = new File(Paths.get(homeDirFile, "fn"));
+        File newFile = new File(Paths.get(homeDirFile, fn));
         new File(newFile.getParent()).mkdirs();
         FileOutputStream fos = new FileOutputStream(newFile);
         int len;
@@ -118,10 +118,10 @@ public class Actions {
         fos.close();
         zis.closeEntry();
         ze = zis.getNextEntry();
-    }
-    zis.closeEntry();
-    zis.close();
-    fis.close();
+      }
+      zis.closeEntry();
+      zis.close();
+      fis.close();
     } catch (Exception e) {
         StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
@@ -167,6 +167,7 @@ public class Actions {
       }
     }
   }
+
   public static void run() {}
   public static void update() {}
   public static void reinstall() {}
