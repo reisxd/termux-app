@@ -23,11 +23,9 @@ import com.termux.shared.termux.shell.command.environment.TermuxShellEnvironment
 import static com.termux.shared.termux.TermuxConstants.TERMUX_HOME_DIR_PATH;
 import static com.termux.shared.termux.TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH;
 
-public final Actions {
+public class Actions {
   private void Actions() {}
   
-  private static final String TAG = "RVBA_Startup:Actions";
-
   private static final String RVB_LOCATION = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder");
 
   private static void send(WebSocket conn, String type, String msg) {
@@ -164,7 +162,7 @@ public final Actions {
       }
     }
   }
-  public static idkwhattoreturn run() {}
-  public static idkwhattoreturn update() {}
-  public static idkwhattoreturn reinstall() {}
+  public static void run() {}
+  public static void update() {}
+  public static void reinstall() {}
 }
