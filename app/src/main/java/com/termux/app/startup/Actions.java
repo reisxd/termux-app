@@ -2,6 +2,7 @@ package com.termux.app.startup;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,9 +10,14 @@ import java.nio.file.Paths;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.PrintWriter;
+import java.util.StringWriter;
+import java.zip.ZipEntry;
+import java.zip.ZipInputStream;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.os.AsyncTask;
 
 import org.java_websocket.WebSocket;
 
@@ -26,10 +32,10 @@ import static com.termux.shared.termux.TermuxConstants.TERMUX_BIN_PREFIX_DIR_PAT
 public class Actions {
   private void Actions() {}
   
-  private static final String RVB_LOCATION = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder");
+  private static final String RVB_LOCATION = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder").toString();
 
   private static void send(WebSocket conn, String type, String msg) {
-    Hashmap<String, String> hm = new HashMap();
+    HashMap<String, String> hm = new HashMap();
     hm.put("type", type);
     hm.put("msg", msg);
     JSONObject json = new JSONObject(hm);
@@ -39,14 +45,14 @@ public class Actions {
   private static boolean isRvbInstalled() {
     File d = new File(RVB_LOCATION);
     if (d.exists() && d.isDirectory()) {
-      boolean dirList = d.listFiles();
+      File[] dirList = d.listFiles();
       return !(dirList == null || dirList.length == 0);
     } else return false;
   }
 
   private static HashMap exec(Context c, String command, String[] args) {
-    ExecutionCommand ec = new ExecutionCommand(-1, Paths.get(TERMUX_BIN_PREFIX_DIR_PATH, command), args, null, RVB_LOCATION, ExecutionCommand.Runner.APP_SHELL.getName(), false);
-    AppShell as = AppShell.execute(c, ec, new TermuxShellEnvironment(), null, false);
+    ExecutionCommand ec = new ExecutionCommand(-1, Paths.get(TERMUX_BIN_PREFIX_DIR_PATH, command).toString(), args, null, RVB_LOCATION, ExecutionCommand.Runner.APP_SHELL.getName(), false);
+    AppShell as = AppShell.execute(c, ec, null, new TermuxShellEnvironment(), null, false);
     HashMap<String, Object> res = new HashMap();
     res.put("isError", new Boolean((as == null || !ec.isSuccessful() || ec.resultData.exitCode != 0) || ec.resultData.isStateFailed()));
     res.put("stdout", ec.resultData.stdout);
@@ -54,8 +60,7 @@ public class Actions {
     return res;
   }
 
-  class DLoadRVB extends AsyncTask<WebSocket, String, String> {
-    @Override
+  class DLoadRVB extends AsyncTask<WebSocket, Object, String> {
     protected String doInBackground(WebSocket... ws) {
       try{
         int count = 0;
@@ -65,12 +70,12 @@ public class Actions {
         conn.connect();
         int fileSize = conn.getContentLength();
         InputStream i = new BufferedInputStream(url.openStream(), 8192);
-        OutputStream o = new FileOutputStream(Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder.zip"));
+        OutputStream o = new FileOutputStream(Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder.zip").toString());
         byte data[] = new byte[1024];
         long total = 0;
         while((count = i.read(data)) != -1) {
           total += count;
-          publishProgress("" + (int) ((total * 100) / lengthOfFile));
+          publishProgress(new Object[] {ws, "" + (int) ((total * 100) / fileSize)});
           o.write(data, 0, count);
         }
         o.flush();
@@ -83,18 +88,18 @@ public class Actions {
       }
       return null;
     }
-    protected void onProgressUpdate(String... progress) {
-      send(ws, "progress", progress[0]);
+    protected void onProgressUpdate(Object... data) {
+      send(data[0], "progress", data[1]);
     }
   }
 
   private static boolean installRvb(Context c, WebSocket ws) {
-    new DLoadRVB().execute();
+    new DLoadRVB().execute(ws);
 
     send(ws, "info", "Unzipping revanced-builder.zip");
     File homeDirFile = new File(TERMUX_HOME_DIR_PATH);
-    String zip = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder.zip");
-    if(!dir.isExists()) dir.mkdirs();
+    String zip = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder.zip").toString();
+    if(!homeDirFile.isExists()) homeDirFile.mkdirs();
     FileInputStream fis;
     final byte[] buffer = new byte[8096];
     try {
@@ -124,14 +129,14 @@ public class Actions {
         return false;
     }
 
-    if (!(new File(Paths.get(homeDirFile, "revanced-builder-main"))).renameTo(new File(RVB_LOCATION))) {
+    if (!(new File(Paths.get(homeDirFile, "revanced-builder-main"))).renameTo(RVB_LOCATION)) {
       send(ws, "error", "Error while renaming revanced-builder-main to revanced-buiilder!");
       return false;
     }
 
     send(ws, "info", "Installing packages");
     HashMap npmExecResult = exec(c, "npm", new String[] {"ci", "--omit=dev"});
-    if(npmExecResult.get("isError")) {
+    if(new Boolean(npmExecResult.get("isError"))) {
       send(ws, "error", "Error while installing packages!\n\nStderr:\n" + npmExecResult.get("stderr"));
       return false;
     }
@@ -153,7 +158,7 @@ public class Actions {
       return true;
     } else {
       send(ws, "info", "ReVanced Builder not installed. Installing.");
-      if (installRvb()) {
+      if (installRvb(c, ws)) {
         send(ws, "success", "ReVanced Builder installed!");
         return true;
       } else {
