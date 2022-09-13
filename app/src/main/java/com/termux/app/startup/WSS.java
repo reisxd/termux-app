@@ -4,6 +4,8 @@ import java.net.InetSocketAddress;
 
 import org.json.JSONObject;
 
+import android.content.Context;
+
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
