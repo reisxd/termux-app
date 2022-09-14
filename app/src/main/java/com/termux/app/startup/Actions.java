@@ -132,14 +132,15 @@ public class Actions {
     }
     send(ws, "success", "Unzipped!");
 
-    if (!(new File(Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder-main").toString())).renameTo(RVB_LOCATION)) {
+    String rvbMain = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder-main").toString();
+    if ((new File(rvbMain)).renameTo(RVB_LOCATION)) {
       send(ws, "error", "Error while renaming revanced-builder-main to revanced-buiilder!");
       return false;
     }
 
     send(ws, "info", "Installing packages");
     HashMap npmExecResult = exec(c, "npm", new String[] {"ci", "--omit=dev"});
-    if(Boolean.parseBoolean(npmExecResult.get("isError"))) {
+    if(Boolean.parseBoolean(npmExecResult.get("isError").toString())) {
       send(ws, "error", "Error while installing packages!\n\nStderr:\n" + npmExecResult.get("stderr"));
       return false;
     } else {
