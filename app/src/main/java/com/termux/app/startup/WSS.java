@@ -35,33 +35,37 @@ public class WSS extends WebSocketServer {
   }
 
   @Override
-  public void onMessage(WebSocket c, String msg) throws JSONException {
+  public void onMessage(WebSocket c, String msg) {
     // We assume its a JSON string.
     Logger.logDebug(TAG, "Received message from " + c.getRemoteSocketAddress() + ":\n" + msg);
-    JSONObject msgJson = new JSONObject(msg);
-    String action = msgJson.get("action").toString();
-    switch(action) {
-      case "preflight":
-        Actions.preflight(context, c);
-        break;
-      case "run":
-        Actions.run();
-        break;
-      case "update":
-        Actions.update();
-        break;
-      case "reinstall":
-        Actions.reinstall();
-        break;
-      default:
-        // send some error here Ig
-        break;
+    try {
+      JSONObject msgJson = new JSONObject(msg);
+      String action = msgJson.get("action").toString();
+      switch(action) {
+        case "preflight":
+          Actions.preflight(context, c);
+          break;
+        case "run":
+          Actions.run();
+          break;
+        case "update":
+          Actions.update();
+          break;
+        case "reinstall":
+          Actions.reinstall();
+          break;
+        default:
+          // send some error here Ig
+          break;
+      }
+    } catch (JSONException ex) {
+      Logger.logError(TAG, "Error occured while parsing message. Exception:\n" + Log.getStackTraceString(ex));
     }
   }
 
   @Override
   public void onError(WebSocket c, Exception ex) {
-    Logger.logError(TAG, "Error occured at " + c.getRemoteSocketAddress() + ":\n" + Log.getStackTraceString(ex));
+    Logger.logError(TAG, "Error occured at connection " + c.getRemoteSocketAddress() + ":\n" + Log.getStackTraceString(ex));
   }
 
   @Override
