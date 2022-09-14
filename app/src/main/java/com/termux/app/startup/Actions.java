@@ -6,14 +6,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Paths;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
-import java.util.PrintWriter;
-import java.util.StringWriter;
-import java.zip.ZipEntry;
-import java.zip.ZipInputStream;
+import java.util.zip.ZipEntry;
+import java.util.ZipInputStream;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -50,16 +50,6 @@ public class Actions {
     } else return false;
   }
 
-  private static HashMap exec(Context c, String command, String[] args) {
-    ExecutionCommand ec = new ExecutionCommand(-1, Paths.get(TERMUX_BIN_PREFIX_DIR_PATH, command).toString(), args, null, RVB_LOCATION, ExecutionCommand.Runner.APP_SHELL.getName(), false);
-    AppShell as = AppShell.execute(c, ec, null, new TermuxShellEnvironment(), null, false);
-    HashMap<String, Object> res = new HashMap();
-    res.put("isError", new Boolean((as == null || !ec.isSuccessful() || ec.resultData.exitCode != 0) || ec.resultData.isStateFailed()));
-    res.put("stdout", ec.resultData.stdout);
-    res.put("stderr", ec.resultData.stderr);
-    return res;
-  }
-
   class DLoadRVB extends AsyncTask<WebSocket, Object, String> {
     protected String doInBackground(WebSocket... ws) {
       try{
@@ -89,9 +79,20 @@ public class Actions {
       return null;
     }
     protected void onProgressUpdate(Object... data) {
-      send(data[0], "progress", data[1]);
+      send(((WebSocket)data[0]), "progress", new String(data[1]));
     }
   }
+
+  private static HashMap exec(Context c, String command, String[] args) {
+    ExecutionCommand ec = new ExecutionCommand(-1, Paths.get(TERMUX_BIN_PREFIX_DIR_PATH, command).toString(), args, null, RVB_LOCATION, ExecutionCommand.Runner.APP_SHELL.getName(), false);
+    AppShell as = AppShell.execute(c, ec, null, new TermuxShellEnvironment(), null, false);
+    HashMap<String, String> res = new HashMap();
+    res.put("isError", new String((as == null || !ec.isSuccessful() || ec.resultData.exitCode != 0) || ec.resultData.isStateFailed()));
+    res.put("stdout", ec.resultData.stdout.toString());
+    res.put("stderr", ec.resultData.stderr.toString());
+    return res;
+  }
+
 
   private static boolean installRvb(Context c, WebSocket ws) {
     new DLoadRVB().execute(ws);
@@ -100,7 +101,7 @@ public class Actions {
     send(ws, "info", "Unzipping revanced-builder.zip");
     File homeDirFile = new File(TERMUX_HOME_DIR_PATH);
     String zip = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder.zip").toString();
-    if(!homeDirFile.isExists()) homeDirFile.mkdirs();
+    if(!homeDirFile.exists()) homeDirFile.mkdirs();
     FileInputStream fis;
     final byte[] buffer = new byte[8096];
     try {
@@ -109,7 +110,7 @@ public class Actions {
       ZipEntry ze = zis.getNextEntry();
       while(ze != null) {
         String fn = ze.getName();
-        File newFile = new File(Paths.get(homeDirFile, fn));
+        File newFile = new File(Paths.get(TERMUX_HOME_DIR_PATH, fn));
         new File(newFile.getParent()).mkdirs();
         FileOutputStream fos = new FileOutputStream(newFile);
         int len;
@@ -131,14 +132,14 @@ public class Actions {
     }
     send(ws, "success", "Unzipped!");
 
-    if (!(new File(Paths.get(homeDirFile, "revanced-builder-main"))).renameTo(RVB_LOCATION)) {
+    if (!(new File(Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder-main"))).renameTo(RVB_LOCATION)) {
       send(ws, "error", "Error while renaming revanced-builder-main to revanced-buiilder!");
       return false;
     }
 
     send(ws, "info", "Installing packages");
     HashMap npmExecResult = exec(c, "npm", new String[] {"ci", "--omit=dev"});
-    if(new Boolean(npmExecResult.get("isError"))) {
+    if(npmExecResult.get("isError").toString()) {
       send(ws, "error", "Error while installing packages!\n\nStderr:\n" + npmExecResult.get("stderr"));
       return false;
     } else {
