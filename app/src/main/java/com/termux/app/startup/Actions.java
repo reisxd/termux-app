@@ -14,6 +14,7 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -34,7 +35,7 @@ public class Actions {
   
   private static final String RVB_LOCATION = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder").toString();
 
-  private static void send(WebSocket conn, String type, String msg) {
+  private static void send(WebSocket conn, String type, String msg) throws JSONException {
     HashMap<String, String> hm = new HashMap();
     hm.put("type", type);
     hm.put("msg", msg);
