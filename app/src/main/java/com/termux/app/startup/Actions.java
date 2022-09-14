@@ -139,7 +139,7 @@ public class Actions {
 
     send(ws, "info", "Installing packages");
     HashMap npmExecResult = exec(c, "npm", new String[] {"ci", "--omit=dev"});
-    if(npmExecResult.get("isError").toString()) {
+    if(new Boolean(npmExecResult.get("isError"))) {
       send(ws, "error", "Error while installing packages!\n\nStderr:\n" + npmExecResult.get("stderr"));
       return false;
     } else {
