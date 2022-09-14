@@ -2,6 +2,7 @@ package com.termux.app.startup;
 
 import java.net.InetSocketAddress;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -34,7 +35,7 @@ public class WSS extends WebSocketServer {
   }
 
   @Override
-  public void onMessage(WebSocket c, String msg) {
+  public void onMessage(WebSocket c, String msg) throws JSONException {
     // We assume its a JSON string.
     Logger.logDebug(TAG, "Received message from " + c.getRemoteSocketAddress() + ":\n" + msg);
     JSONObject msgJson = new JSONObject(msg);
