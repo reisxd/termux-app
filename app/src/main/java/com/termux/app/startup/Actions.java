@@ -132,8 +132,7 @@ public class Actions {
     }
     send(ws, "success", "Unzipped!");
 
-    String rvbMain = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder-main").toString();
-    if ((new File(rvbMain)).renameTo(RVB_LOCATION)) {
+    if ((new File(TERMUX_HOME_DIR_PATH, "revanced-builder-main")).renameTo(RVB_LOCATION)) {
       send(ws, "error", "Error while renaming revanced-builder-main to revanced-buiilder!");
       return false;
     }
