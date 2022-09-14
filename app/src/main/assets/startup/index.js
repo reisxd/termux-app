@@ -22,8 +22,17 @@ function switchTo(page) {
   lastPage = page;
 }
 
+function setGoToHomeState(clickable) {
+  const b = document.querySelector("#goToHome");
+  if (!clickable)
+    b.setAttribute("disabled", "disabled");
+  else
+    b.removeAttribute("disabled");
+}
+
 function run() {
   switchTo("next-step");
+  setGoToHomeState(false);
   changeHeader("Preflight", "Checking if ReVanced Builder is installed");
   ws.send(JSON.stringify({ action: "preflight" }));
 }
@@ -78,10 +87,32 @@ function goToHome () {
   }
 }
 
-function exit() {
+function exit () {
   // TODO: send 'exit' message here
   document.getElementById(lastPage).style.display = "none";
   document.getElementById("content--wrapper").style.backgroundColor = "transparent";
   document.getElementsByTagName("footer")[0].style.display = "none";
   changeHeader("Exited", "The app should automatically close. If it doesn't, close the app manually.");
 }
+
+function appendLogOrProgress ({ type, msg }) {
+  const log = document.getElementsByClassName("log")[0];
+  const logLine document.createElement("span");
+  if (type === "progress") {
+    const prog = document.getElementsByTagName("progress")[0];
+    if (parseInt(msg) < 100) {
+      prog.style.display = "block";
+      prog.setAttribute("value", msg);
+    } else {
+      prog.style.display = "none";
+    }
+    return;
+  }
+  if (type === "error") setGoToHomeState(true);
+
+  logLine.setAttribute("class", `log-line ${type}`);
+  logLine.innerHTML = `<strong>[${type.toUpperCase()}]</strong> ${msg}`;
+  log.appendChild(logLine);
+}
+
+ws.onmessage = ({ data }) => appendLogOrProgress(JSON.parse(data));

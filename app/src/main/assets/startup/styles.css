@@ -306,3 +306,27 @@ li h4 {
 .elijah629 {
   background-image: url('https://github.com/Elijah629.png');
 }
+
+/* Progress bar */
+
+progress {
+  margin-top: 20px;
+  width: 100%;
+  border-radius: 25px;
+  border: none;
+  display: none;
+}
+
+progress::-moz-progress-bar {
+  border-radius: 25px;
+  background-color: var(--accentColor);
+}
+
+progress::-webkit-progress-bar {
+  background-color: var(--contrastColor);
+  border-radius: 7px;
+}
+progress::-webkit-progress-value {
+  background-color: var(--accentColor);
+  border-radius: 7px;
+}
