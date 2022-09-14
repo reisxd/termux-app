@@ -35,12 +35,18 @@ public class Actions {
   
   private static final String RVB_LOCATION = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder").toString();
 
-  private static void send(WebSocket conn, String type, String msg) throws JSONException {
+  private static void send(WebSocket conn, String type, String msg) {
     HashMap<String, String> hm = new HashMap();
     hm.put("type", type);
     hm.put("msg", msg);
-    JSONObject json = new JSONObject(hm);
-    conn.send(json.toString());
+    try {
+      JSONObject json = new JSONObject(hm);
+      conn.send(json.toString());
+    } catch (JSONException e) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        Logger.logError("Startup:Actions:send", "Failed to send message to client! Exception:\n" + sw.toString());
+    }
   }
 
   private static boolean isRvbInstalled() {
