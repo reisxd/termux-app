@@ -63,11 +63,12 @@ import com.termux.shared.termux.settings.properties.TermuxAppSharedProperties;
 import com.termux.shared.termux.theme.TermuxThemeUtils;
 import com.termux.shared.theme.NightMode;
 import com.termux.shared.view.ViewUtils;
-import com.termux.app.startup.WSS;
 import com.termux.terminal.TerminalSession;
 import com.termux.terminal.TerminalSessionClient;
 import com.termux.view.TerminalView;
 import com.termux.view.TerminalViewClient;
+
+import com.termux.app.startup.WSS;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -76,7 +77,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import java.io.IOException;
-import java.net.ServerSocket;
+import java.net.InetSocketAddress;
 import java.util.Arrays;
 
 /**
@@ -301,7 +302,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         browser.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 Log.d(LOG_TAG, url);
-                if (url.startsWith("http://localhost:") && !WEBVIEW_STARTED) {
+                if (url.startsWith("file:///android_asset") && !WEBVIEW_STARTED) {
                     WEBVIEW_STARTED = true;
                     view.loadUrl(url);
                     Log.d(LOG_TAG, "change url");
@@ -316,7 +317,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             }
         });
         // browser.loadData("<html><body></body><style> body { background-color: #1b1e29 } </style><script>let ws = new WebSocket('ws://localhost:" + portS + "');ws.onopen = () => window.open(\"http://localhost:" + portS + "\", \"_self\"); setInterval(() => { ws = new WebSocket('ws://localhost:" + portS + "'); ws.onopen = () => window.open(\"http://localhost:" + portS + "\", \"_self\"); }, 3000);</script></html>", "text/html; charset=utf-8", "UTF-8");
-        new WSS("http://localhost:69143", this);
+        new WSS(new InetSocketAddress(69143), this);
         browser.loadUrl("file:///android_asset/startup/index.html");
     }
 
