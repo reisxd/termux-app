@@ -70,6 +70,8 @@ import com.termux.view.TerminalViewClient;
 
 import com.termux.app.startup.WSS;
 
+import org.java_websocket.server.WebSocketServer;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -317,7 +319,8 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             }
         });
         // browser.loadData("<html><body></body><style> body { background-color: #1b1e29 } </style><script>let ws = new WebSocket('ws://localhost:" + portS + "');ws.onopen = () => window.open(\"http://localhost:" + portS + "\", \"_self\"); setInterval(() => { ws = new WebSocket('ws://localhost:" + portS + "'); ws.onopen = () => window.open(\"http://localhost:" + portS + "\", \"_self\"); }, 3000);</script></html>", "text/html; charset=utf-8", "UTF-8");
-        new WSS(new InetSocketAddress(69143), this);
+        WebSocket wss = new WSS(new InetSocketAddress(69143), this);
+        wss.run();
         browser.loadUrl("file:///android_asset/startup/index.html");
     }
 
