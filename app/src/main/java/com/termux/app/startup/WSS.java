@@ -2,7 +2,6 @@ package com.termux.app.startup;
 
 import java.net.InetSocketAddress;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -58,7 +57,7 @@ public class WSS extends WebSocketServer {
           // send some error here Ig
           break;
       }
-    } catch (JSONException ex) {
+    } catch (Exception ex) {
       Logger.logError(TAG, "Error occured while parsing message. Exception:\n" + Log.getStackTraceString(ex));
     }
   }

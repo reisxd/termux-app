@@ -14,7 +14,6 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
