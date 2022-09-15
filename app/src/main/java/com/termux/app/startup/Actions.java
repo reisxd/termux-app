@@ -42,10 +42,10 @@ public class Actions {
     try {
       JSONObject json = new JSONObject(hm);
       conn.send(json.toString());
-    } catch (JSONException e) {
-        StringWriter sw = new StringWriter();
-        e.printStackTrace(new PrintWriter(sw));
-        Logger.logError("Startup:Actions:send", "Failed to send message to client! Exception:\n" + sw.toString());
+    } catch (Exception e) {
+      StringWriter sw = new StringWriter();
+      e.printStackTrace(new PrintWriter(sw));
+      Logger.logError("Startup:Actions:send", "Failed to send message to client! Exception:\n" + sw.toString());
     }
   }
 
