@@ -319,8 +319,13 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
             }
         });
         browser.loadData("<html><body><style>body { background: #1b1e29; color: white; }</style><h1>Loading...</h1></body></html>", "text/html; charset=utf-8", "UTF-8");
-        WebSocketServer wss = new WSS(new InetSocketAddress(65469), this);
-        wss.run();
+        new Thread() {
+          @Override
+          public void run() {
+            WebSocketServer wss = new WSS(new InetSocketAddress(65469), this);
+            wss.run();
+          }
+        }.start();
         browser.loadUrl("file:///android_asset/index.html");
     }
 
