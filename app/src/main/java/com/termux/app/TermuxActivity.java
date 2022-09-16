@@ -304,7 +304,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         browser.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 Log.d(LOG_TAG, url);
-                if (!WEBVIEW_STARTED) {
+                if (url.contains("android_asset") && !WEBVIEW_STARTED) {
                     WEBVIEW_STARTED = true;
                     view.loadUrl(url);
                     Log.d(LOG_TAG, "change url");
@@ -318,7 +318,6 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
             }
         });
-        // browser.loadData("<html><body></body><style> body { background-color: #1b1e29 } </style><script>let ws = new WebSocket('ws://localhost:" + portS + "');ws.onopen = () => window.open(\"http://localhost:" + portS + "\", \"_self\"); setInterval(() => { ws = new WebSocket('ws://localhost:" + portS + "'); ws.onopen = () => window.open(\"http://localhost:" + portS + "\", \"_self\"); }, 3000);</script></html>", "text/html; charset=utf-8", "UTF-8");
         browser.loadData("<html><body><style>body { background: #1b1e29; color: white; }</style><h1>Loading...</h1></body></html>", "text/html; charset=utf-8", "UTF-8");
         WebSocketServer wss = new WSS(new InetSocketAddress(65469), this);
         wss.run();
