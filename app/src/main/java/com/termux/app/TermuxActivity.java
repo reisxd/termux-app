@@ -304,7 +304,7 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
         browser.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 Log.d(LOG_TAG, url);
-                if (url.startsWith("file:///android_asset") && !WEBVIEW_STARTED) {
+                if (!WEBVIEW_STARTED) {
                     WEBVIEW_STARTED = true;
                     view.loadUrl(url);
                     Log.d(LOG_TAG, "change url");
