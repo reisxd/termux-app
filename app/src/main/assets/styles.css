@@ -204,6 +204,9 @@ span.log .log-line.error {
 span.log .log-line.warn {
   color: #c4d204;
 }
+span.log {
+  display: none;
+}
 
 span.log:after {
   content: '｜';
