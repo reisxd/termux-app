@@ -64,7 +64,7 @@ public class WSS extends WebSocketServer {
 
   @Override
   public void onError(WebSocket c, Exception ex) {
-    Logger.logError(TAG, "Error occured at connection " + c.getRemoteSocketAddress() + ":\n" + Log.getStackTraceString(ex));
+    Logger.logError(TAG, "An error occured:\n" + Log.getStackTraceString(ex));
   }
 
   @Override
