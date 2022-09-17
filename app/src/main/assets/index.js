@@ -118,4 +118,9 @@ function appendLogOrProgress (data) {
   log.innerHTML += `<span class="log-line ${type}><strong>[${type.toUpperCase()}]</strong> ${msg}</span>"`;
 }
 
-ws.onmessage = (msg) => appendLogOrProgress(JSON.parse(msg.data));
+ws.onmessage = (ev) => {
+  const data = ev.data;
+  const message = JSON.parse(data);
+  console.table(message);
+  appendLogOrProgress(message);
+}
