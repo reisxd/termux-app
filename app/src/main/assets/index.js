@@ -97,7 +97,7 @@ function exit () {
 
 function appendLogOrProgress ({ type, msg }) {
   const log = document.getElementsByClassName("log")[0];
-  const logLine document.createElement("span");
+  const logLine = document.createElement("span");
   if (type === "progress") {
     const prog = document.getElementsByTagName("progress")[0];
     if (parseInt(msg) < 100) {
