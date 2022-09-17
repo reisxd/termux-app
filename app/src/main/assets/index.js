@@ -1,5 +1,6 @@
 const WS_URI = `${window?.location?.protocol === 'https:' ? 'wss' : 'ws'}://localhost:65469`;
 const ws = new WebSocket(WS_URI);
+ws.onopen = data => console.log("onOpen!\n" + data);
 
 let lastPage = "home";
 
@@ -11,10 +12,13 @@ function changeHeader(_head, _desc) {
 }
 
 function switchTo(page) {
-  if (page == "home")
-    document.querySelector("#goToHome").display = "none";
-  else
-    document.querySelector("#goToHome").display = "block";
+  if (page == "home") {
+    document.querySelector("#goToHome").style.display = "none";
+    document.querySelector("#exit").style.display = "block";
+  } else {
+    document.querySelector("#goToHome").style.display = "block";
+    document.querySelector("#exit").style.display = "none";
+  }
   document.getElementById(lastPage)
     .style.display = "none";
   document.getElementById(page)
@@ -95,9 +99,10 @@ function exit () {
   changeHeader("Exited", "The app should automatically close. If it doesn't, close the app manually.");
 }
 
-function appendLogOrProgress ({ type, msg }) {
+function appendLogOrProgress (data) {
+  const type = data.type;
+  const msg = data.msg;
   const log = document.getElementsByClassName("log")[0];
-  const logLine = document.createElement("span");
   if (type === "progress") {
     const prog = document.getElementsByTagName("progress")[0];
     if (parseInt(msg) < 100) {
@@ -110,9 +115,7 @@ function appendLogOrProgress ({ type, msg }) {
   }
   if (type === "error") setGoToHomeState(true);
 
-  logLine.setAttribute("class", `log-line ${type}`);
-  logLine.innerHTML = `<strong>[${type.toUpperCase()}]</strong> ${msg}`;
-  log.appendChild(logLine);
+  log.innerHTML += `<span class="log-line ${type}><strong>[${type.toUpperCase()}]</strong> ${msg}</span>"`;
 }
 
-ws.onmessage = ({ data }) => appendLogOrProgress(JSON.parse(data));
+ws.onmessage = (msg) => appendLogOrProgress(JSON.parse(msg.data));
