@@ -318,14 +318,9 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
 
             }
         });
-        new Thread() {
-          @Override
-          public void run() {
-            WebSocketServer wss = new WSS(new InetSocketAddress(65469), TermuxActivity.this);
-            wss.start();
-          }
-        }.start();
+        WebSocketServer wss = new WSS(new InetSocketAddress(65469), TermuxActivity.this);
         browser.loadUrl("file:///android_asset/index.html");
+        wss.start();
     }
 
     @Override
