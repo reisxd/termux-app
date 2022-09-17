@@ -122,6 +122,5 @@ ws.onmessage = (ev) => {
   document.getElementsByClassName("log")[0].style.display = "block";
   const data = ev.data;
   const message = JSON.parse(data);
-  console.table(message);
   appendLogOrProgress(message);
 }
