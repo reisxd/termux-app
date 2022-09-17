@@ -102,12 +102,15 @@ public class Actions {
 
   private static boolean installRvb(Context c, WebSocket ws) {
     new DLoadRVB().execute(ws);
-    send(ws, "success", "Downloaded!");
+    String zip = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder.zip").toString();
+    if (new File(zip).exists())
+      send(ws, "success", "Downloaded!");
+    else {
+      send(ws, "error", "Failed to download ZIP!");
+      return false;
+    }
 
     send(ws, "info", "Unzipping revanced-builder.zip");
-    File homeDirFile = new File(TERMUX_HOME_DIR_PATH);
-    String zip = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder.zip").toString();
-    if(!homeDirFile.exists()) homeDirFile.mkdirs();
     FileInputStream fis;
     final byte[] buffer = new byte[8096];
     try {
