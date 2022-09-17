@@ -71,7 +71,7 @@ public class Actions {
         long total = 0;
         while((count = i.read(data)) != -1) {
           total += count;
-          publishProgress(ws, "" + (int) ((total * 100) / fileSize));
+          publishProgress(ws[0], "" + (int) ((total * 100) / fileSize));
           o.write(data, 0, count);
         }
         o.flush();
@@ -85,7 +85,7 @@ public class Actions {
       return null;
     }
     protected void onProgressUpdate(Object... data) {
-      send((WebSocket)data[0], "progress", String.valueOf(data[1]));
+      send((WebSocket)(data[0]), "progress", String.valueOf(data[1]));
     }
   }
 
