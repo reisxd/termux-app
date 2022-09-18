@@ -45,7 +45,7 @@ public class Actions {
       Utils.send(ws, "error", "Error while installing packages!\n\nStderr:\n" + npmExecResult.get("stderr"));
       return false;
     } else {
-      send(ws, "success", "Packages installed!");
+      Utils.send(ws, "success", "Packages installed!");
     }
 
     return true;
