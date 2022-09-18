@@ -34,7 +34,7 @@ public class Actions {
       return false;
 
     File rvbMain = new File(Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder-main").toString());
-    if (!rvbMain.renameTo(new File(RVB_LOCATION))) {
+    if (!rvbMain.renameTo(new File(Utils.RVB_LOCATION))) {
       Utils.send(ws, "error", "Error while renaming revanced-builder-main to revanced-buiilder!");
       return false;
     }
