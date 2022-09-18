@@ -12,13 +12,14 @@ import java.nio.file.Paths;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.java_websocket.WebSocket;
 
 import com.termux.shared.android.PermissionUtils;
@@ -111,34 +112,48 @@ public class Actions {
     }
 
     send(ws, "info", "Unzipping revanced-builder.zip");
-    FileInputStream fis;
-    final byte[] buffer = new byte[8096];
-    try {
-      fis = new FileInputStream(zip);
-      ZipInputStream zis = new ZipInputStream(fis);
-      ZipEntry ze = zis.getNextEntry();
-      while(ze != null) {
-        String fn = ze.getName();
-        File newFile = new File(Paths.get(TERMUX_HOME_DIR_PATH, fn).toString());
-        new File(newFile.getParent()).mkdirs();
-        FileOutputStream fos = new FileOutputStream(newFile);
-        int len;
-        while((len = zis.read(buffer)) > 0) {
-          fos.write(buffer, 0, len);
-        }
-        fos.close();
-        zis.closeEntry();
-        ze = zis.getNextEntry();
+    try(ZipArchiveInputStream zais = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(zip)))) {
+      ZipArchiveEntry entry;
+      while ((entry = zais.getNextZipEntry()) != null) {
+        File newFile = new File(TERMUX_HOME_DIR_PATH, entry.getName());
+        newFile.getParentFile().mkdirs();
+        IOUtils.copy(zais, new FileOutputStream(newFile));
       }
-      zis.closeEntry();
-      zis.close();
-      fis.close();
     } catch (Exception e) {
         StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
         send(ws, "error", "Error while unzipping revanced-builder.zip!\n" + sw.toString());
         return false;
     }
+
+//    FileInputStream fis;
+//    final byte[] buffer = new byte[8096];
+//    try {
+//      fis = new FileInputStream(zip);
+//      ZipInputStream zis = new ZipInputStream(fis);
+//      ZipEntry ze = zis.getNextEntry();
+//      while(ze != null) {
+//        String fn = ze.getName();
+//        File newFile = new File(Paths.get(TERMUX_HOME_DIR_PATH, fn).toString());
+//        new File(newFile.getParent()).mkdirs();
+//        FileOutputStream fos = new FileOutputStream(newFile);
+//        int len;
+//        while((len = zis.read(buffer)) > 0) {
+//          fos.write(buffer, 0, len);
+//        }
+//        fos.close();
+//        zis.closeEntry();
+//        ze = zis.getNextEntry();
+//      }
+//      zis.closeEntry();
+//      zis.close();
+//      fis.close();
+//    } catch (Exception e) {
+//        StringWriter sw = new StringWriter();
+//        e.printStackTrace(new PrintWriter(sw));
+//        send(ws, "error", "Error while unzipping revanced-builder.zip!\n" + sw.toString());
+//        return false;
+//    }
     send(ws, "success", "Unzipped!");
 
     File rvbMain = new File(Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder-main").toString());
