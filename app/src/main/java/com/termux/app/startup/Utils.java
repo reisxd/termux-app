@@ -69,8 +69,8 @@ public final class Utils {
   }
 
   public static boolean unzip(WebSocket conn, File zipFile, File targetDirectory) {
-    ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(zipFile)));
     try {
+      ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(zipFile)));
       ZipEntry ze;
       int count;
       byte[] buffer = new byte[8192];
@@ -92,11 +92,10 @@ public final class Utils {
         if (time > 0)
           file.setLastModified(time);
       }
+      zis.close();
     } catch (Exception e) {
       send(conn, "error", "Failed to unzip!\nException: " + getStackString(e));
       return false;
-    } finally {
-      zis.close();
     }
     send(conn, "success", "Unzipped!");
     return true;
