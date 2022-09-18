@@ -25,6 +25,7 @@ import com.termux.shared.shell.command.runner.app.AppShell;
 import com.termux.shared.termux.shell.command.environment.TermuxShellEnvironment;
 
 import static com.termux.shared.termux.TermuxConstants.TERMUX_HOME_DIR_PATH;
+import static com.termux.shared.termux.TermuxConstants.TERMUX_BIN_PREFIX_DIR_PATH;
 
 public final class Utils {
   public static final String RVB_LOCATION = Paths.get(TERMUX_HOME_DIR_PATH, "revanced-builder").toString();
@@ -55,7 +56,7 @@ public final class Utils {
     } else return false;
   }
 
-  private static HashMap exec(Context c, String command, String[] args) {
+  public static HashMap exec(Context c, String command, String[] args) {
     ExecutionCommand ec = new ExecutionCommand(-1, Paths.get(TERMUX_BIN_PREFIX_DIR_PATH, command).toString(), args, null, RVB_LOCATION, ExecutionCommand.Runner.APP_SHELL.getName(), false);
     AppShell as = AppShell.execute(c, ec, null, new TermuxShellEnvironment(), null, false);
     HashMap<String, String> res = new HashMap();
@@ -95,7 +96,7 @@ public final class Utils {
     } finally {
       zis.close();
     }
-    Utils.send(ws, "success", "Unzipped!");
+    send(conn, "success", "Unzipped!");
     return true;
   }
 
