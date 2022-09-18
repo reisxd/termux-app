@@ -115,11 +115,11 @@ function appendLogOrProgress (data) {
   }
   if (type === "error") setGoToHomeState(true);
 
-  log.innerHTML += `<span class="log-line ${type}><strong>[${type.toUpperCase()}]</strong> ${msg}</span>"`;
+  log.innerHTML += `<span class="log-line ${type}><strong>[${type.toUpperCase()}]</strong> ${msg}</span><br />"`;
 }
 
 ws.onmessage = (ev) => {
-  document.getElementsByClassName("log")[0].style.display = "block";
+  document.getElementsByClassName("log")[0].style.display = "inline";
   const data = ev.data;
   const message = JSON.parse(data);
   appendLogOrProgress(message);
