@@ -40,7 +40,13 @@ android {
         implementation "io.noties.markwon:ext-strikethrough:$markwonVersion"
         implementation "io.noties.markwon:linkify:$markwonVersion"
         implementation "io.noties.markwon:recycler:$markwonVersion"
+
         implementation "org.java-websocket:Java-WebSocket:1.5.3"
+        // Do not increment version higher than 2.5 or there
+        // will be runtime exceptions on android < 8
+        // due to missing classes like java.nio.file.Path.
+        implementation "commons-io:commons-io:2.5"
+        implementation "org.apache.commons:commons-compress:1.21"
 
         implementation project(":terminal-view")
         implementation project(":termux-shared")
