@@ -92,7 +92,6 @@ function goToHome () {
 }
 
 function exit () {
-  // TODO: send 'exit' message here
   document.getElementById(lastPage).style.display = "none";
   document.getElementById("content--wrapper").style.backgroundColor = "transparent";
   document.getElementsByTagName("footer")[0].style.display = "none";
@@ -113,7 +112,10 @@ function appendLogOrProgress (data) {
     }
     return;
   }
-  if (type === "error") setGoToHomeState(true);
+  if (type === "error") {
+    setGoToHomeState(true);
+    document.getElementsByTagName("progress")[0].style.display = "none";
+  }
 
   log.innerHTML += `<span class="log-line ${type}><strong>[${type.toUpperCase()}]</strong> ${msg}</span><br />"`;
 }
