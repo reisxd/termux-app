@@ -34,3 +34,7 @@ app/gradle*
 .swp
 ehthumbs.db
 Thumbs.db
+
+# JDT.LS
+.project
+.settings/
