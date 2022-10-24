@@ -117,7 +117,19 @@ function appendLogOrProgress (data) {
     document.getElementsByTagName("progress")[0].style.display = "none";
   }
 
-  log.innerHTML += `<span class="log-line ${type}><strong>[${type.toUpperCase()}]</strong> ${msg}</span><br />"`;
+  const logLine = document.createElement('span');
+  logLine.classList.add('log-line', type);
+  const strong = document.createElement('strong');
+  strong.innerText = '[' + type.toUpperCase() + ']';
+  const br = document.createElement('br');
+  logLine.innerText = ' ' + msg;
+  logLine.prepend(strong);
+  logLine.appendChild(br);
+  logLine.style.display = 'inline';
+
+  log.appendChild(logLine);
+
+  //log.innerHTML += `<span class="log-line ${type}><strong>[${type.toUpperCase()}]</strong> ${msg}</span><br />"`;
 }
 
 ws.onmessage = (ev) => {
