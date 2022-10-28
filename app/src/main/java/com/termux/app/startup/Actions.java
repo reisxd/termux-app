@@ -77,7 +77,14 @@ public class Actions {
     return true;
   }
 
-  public static void run() {}
+  public static void run(Context c, WebSocket ws) {
+    HashMap runResult = Utils.exec(c, "node", new String[] {"~/revanced-builder"});
+    if (Boolean.parseBoolean(runResult.get("isError").toString())) {
+      Utils.send(ws, "error", "An unexpected error occured:\n" + execResult.get("stderr");
+      return false;
+    }
+  }
+
   public static void update() {}
   public static void reinstall() {}
 }
