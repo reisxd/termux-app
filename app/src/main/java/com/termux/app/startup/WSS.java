@@ -45,7 +45,7 @@ public class WSS extends WebSocketServer {
           Actions.preflight(context, c);
           break;
         case "run":
-          Actions.run();
+          Actions.run(context, c);
           break;
         case "update":
           Actions.update();
