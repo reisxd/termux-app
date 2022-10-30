@@ -74,6 +74,7 @@ public class Actions {
       }
     }
     Utils.send(ws, "success", "All checks done");
+    Utils.send(ws, "stateChange", "run");
     return true;
   }
 
