@@ -34,11 +34,14 @@ function setGoToHomeState(clickable) {
     b.removeAttribute("disabled");
 }
 
-function run() {
+function run(preflightComplete) {
   switchTo("next-step");
   setGoToHomeState(false);
   changeHeader("Preflight", "Checking if ReVanced Builder is installed");
-  ws.send(JSON.stringify({ action: "preflight" }));
+  if (!preflightComplete) {
+    ws.send(JSON.stringify({ action: "preflight" }));
+  } else {
+    ws.send(JSON.stringify({ action: "run" }));
 }
 
 function reinstall() {
@@ -115,6 +118,10 @@ function appendLogOrProgress (data) {
   if (type === "error") {
     setGoToHomeState(true);
     document.getElementsByTagName("progress")[0].style.display = "none";
+  }
+  if (type === "stateChange") {
+    document.getElementsByTagName('progress')[0].style.display = 'none';
+    if (msg === "run") run(true);
   }
 
   const logLine = document.createElement('span');
