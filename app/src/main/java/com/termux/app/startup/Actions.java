@@ -81,7 +81,7 @@ public class Actions {
   public static void run(Context c, WebSocket ws) {
     HashMap runResult = Utils.exec(c, "node", new String[] {"~/revanced-builder"});
     if (Boolean.parseBoolean(runResult.get("isError").toString())) {
-      Utils.send(ws, "error", "An unexpected error occured:\n" + execResult.get("stderr");
+      Utils.send(ws, "error", "An unexpected error occured:\n" + execResult.get("stderr"));
       return false;
     }
   }
