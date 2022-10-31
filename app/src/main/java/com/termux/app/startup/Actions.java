@@ -84,6 +84,7 @@ public class Actions {
       Utils.send(ws, "error", "An unexpected error occured:\n" + runResult.get("stderr"));
       return false;
     }
+    return true;
   }
 
   public static void update() {}
